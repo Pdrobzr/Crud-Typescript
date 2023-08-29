@@ -52,31 +52,54 @@ export class PostController {
     async atualizarPostagem(req: Request, res: Response) {
         const { id } = req.params;
         const idPost = Number(id);
-        const {title, content} = req.body;
+        const { title, content } = req.body;
 
-        const updatePost = await prisma.post.update({
-            data: {
-                title: title,
-                content: content,
-            },
-            where: {
-                id: idPost,
-            },
-        });
-
-        res.json({message: 'Post atualizado com sucesso!', updatePost});
-    }
-
-    async deletarPostagem(req: Request, res: Response) {
-        const idPost = Number(req.params.id);
-
-        const deletePost = await prisma.post.delete({
+        const postExists = await prisma.post.findUnique({
             where: {
                 id: idPost
             }
         });
 
-        res.json({message: 'Post deletado com sucesso!', deletePost});
+        if (!postExists) {
+            return res.status(400).json({ error: 'Erro ao atualizar o post! Id invalido!' });
+        }
+
+        else {
+            const updatePost = await prisma.post.update({
+                data: {
+                    title: title,
+                    content: content,
+                },
+                where: {
+                    id: idPost,
+                },
+            });
+
+            return res.json({ message: 'Post atualizado com sucesso!', updatePost });
+        }
+    }
+  
+    async deletarPostagem(req: Request, res: Response) {
+        const idPost = Number(req.params.id);
+
+        const postExists = await prisma.post.findUnique({
+            where: {
+                id: idPost
+            }
+        });
+
+        if (!postExists) {
+            return res.status(400).json({ error: 'Erro ao deletar! Id inválido!' });
+        } else {
+
+            const deletePost = await prisma.post.delete({
+                where: {
+                    id: idPost
+                }
+            });
+
+            return res.json({ message: 'Post deletado com sucesso!', deletePost });
+        }
     }
 
 }
