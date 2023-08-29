@@ -63,7 +63,7 @@ export class UserController {
 
         const { id } = user;
 
-        return res.json({ user: { id, email }, token });
+        return res.json({ message: 'Usuário logado com sucesso!', user: { id, email }, token });
     }
 
     async atualizarUsuario(req: Request, res: Response) {
@@ -71,13 +71,13 @@ export class UserController {
         const idInt = Number(id);
         const { name, email } = req.body;
 
-        const user = await prisma.user.findUnique({
+        const userExists = await prisma.user.findUnique({
             where: {
                 id: idInt
             }
         })
 
-        if (!user) {
+        if (!userExists) {
             return res.status(401).json({ error: 'Erro ao atualizar usuário!' });
         } else {
 
@@ -99,13 +99,13 @@ export class UserController {
         const { id } = req.params;
         const idInt = Number(id);
 
-        const user = await prisma.user.findUnique({
+        const userExists = await prisma.user.findUnique({
             where: {
                 id: idInt
             }
         })
 
-        if (!user) {
+        if (!userExists) {
             res.status(401).json({ error: 'Erro ao excluir o usuário' });
         } else {
 
